@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 ```
@@ -19,4 +19,4 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 2. **API 및 서비스 → 사용자 인증 정보 → OAuth 2.0 클라이언트 ID** 생성
 3. 승인된 리디렉션 URI에 추가:
 ```
-https://[your-project-ref].supabase.co/auth/v1/callback
+https://zqyzlqqedjaretwdxgyq.supabase.co/auth/v1/callback
