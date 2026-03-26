@@ -6,25 +6,40 @@ import { synclePalette as palette } from '@/lib/synclePalette'
  * SynclePhoneFrame
  * 역할: 모든 화면에서 공통으로 사용하는 폰 프레임 + 상단 헤더 쉘
  * 입력:
- *   - title: 헤더 큰 제목 (예: "운영 홈")
- *   - subtitle: 헤더 작은 부제목 (예: "모임 운영을 가장 깔끔하게")
+ *   - title: 헤더 큰 제목
+ *   - subtitle: 헤더 작은 부제목
  *   - children: 화면 본문 콘텐츠
  *   - footer: 화면 하단 고정 영역 (CTA 버튼 등), 선택 사항
- * 출력: 320px 폰 프레임 + 민트 헤더 + 스크롤 가능한 본문 영역
+ *   - className: 프레임 외곽 추가 스타일, 선택 사항
  *
- * 수정 시 영향 범위: 헤더 스타일 변경 시 모든 플로우 화면에 영향
+ * 출력:
+ * - 320px 폰 프레임
+ * - 민트 단색 공통 헤더
+ * - 본문 콘텐츠 영역
+ * - 선택적 하단 고정 footer
+ *
+ * 수정 시 영향 범위:
+ * - 헤더 스타일 변경 시 모든 화면에 영향
+ * - 프레임 폭/그림자 변경 시 전체 목업 톤에 영향
  */
 type Props = {
   title: string
   subtitle: string
   children: React.ReactNode
   footer?: React.ReactNode
+  className?: string
 }
 
-export default function SynclePhoneFrame({ title, subtitle, children, footer }: Props) {
+export default function SynclePhoneFrame({
+  title,
+  subtitle,
+  children,
+  footer,
+  className = '',
+}: Props) {
   return (
     <div
-      className="w-[320px] rounded-[34px] border bg-white p-3"
+      className={`w-[320px] rounded-[34px] border bg-white p-3 ${className}`}
       style={{
         borderColor: palette.line,
         boxShadow: '0 25px 60px rgba(34,48,58,0.08)',
@@ -34,7 +49,7 @@ export default function SynclePhoneFrame({ title, subtitle, children, footer }: 
         className="relative min-h-[680px] overflow-hidden rounded-[28px]"
         style={{ backgroundColor: palette.bgSoft }}
       >
-        {/* ── 상단 헤더 ──────────────────────────────── */}
+        {/* 공통 민트 헤더 */}
         <div style={{ backgroundColor: palette.signature }}>
           <div className="px-5 pb-4 pt-4 text-white">
             {/* 상태바 모사 */}
@@ -54,18 +69,17 @@ export default function SynclePhoneFrame({ title, subtitle, children, footer }: 
           </div>
         </div>
 
-        {/* ── 본문 스크롤 영역 ───────────────────────── */}
-        {/* footer가 있을 때 하단 여백을 더 확보 */}
+        {/* 본문 */}
         <div className={`p-4 ${footer ? 'pb-28' : 'pb-6'}`}>
           {children}
         </div>
 
-        {/* ── 하단 고정 footer (CTA 버튼 등) ────────── */}
-        {footer && (
+        {/* 하단 고정 footer */}
+        {footer ? (
           <div className="absolute inset-x-0 bottom-0 px-4 pb-4">
             {footer}
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   )
