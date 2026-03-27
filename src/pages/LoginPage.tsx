@@ -1,6 +1,7 @@
-import { useNavigate } from 'react-router-dom'
+
 import SyncleMark from '@/components/SyncleMark'
 import { synclePalette as palette } from '@/lib/synclePalette'
+import { supabase } from '@/lib/supabase'
 
 /**
  * LoginPage
@@ -38,10 +39,16 @@ function SocialButton({
     </button>
   )
 }
-
+async function signIn(provider: 'google' | 'kakao') {
+  await supabase.auth.signInWithOAuth({
+    provider,
+    options: {
+      redirectTo: `${window.location.origin}/groups`,
+    },
+  })
+}
 export default function LoginPage() {
-  const navigate = useNavigate()
-
+  
   return (
     <div
       className="min-h-screen px-6 py-10"
@@ -93,14 +100,14 @@ export default function LoginPage() {
               bg={palette.bg}
               color={palette.ink}
               borderColor={palette.line}
-              onClick={() => navigate('/groups')}
+              onClick={() => signIn('google')}
             />
 
             <SocialButton
               label="Kakao로 계속하기"
               bg="#FEE500"
               color="#191919"
-              onClick={() => navigate('/groups')}
+              onClick={() => signIn('kakao')}
             />
           </div>
 
