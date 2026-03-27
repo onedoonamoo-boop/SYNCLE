@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { synclePalette as palette } from '@/lib/synclePalette'
+import { supabase } from '@/lib/supabase'
 
 /**
  * GroupListPage
@@ -7,21 +9,39 @@ import { synclePalette as palette } from '@/lib/synclePalette'
  * 현재 단계: Supabase 연결 전, mock 데이터로 라우팅 흐름만 확인
  * 다음 단계: group_members / groups 조회로 실제 데이터 교체
  */
-const mockGroups = [
-  {
-    id: 'running-crew',
-    name: '토요일 러닝 모임',
-    sub: '멤버 24명 · 일정 2개',
-  },
-  {
-    id: 'book-club',
-    name: '월간 북클럽',
-    sub: '멤버 11명 · 공지 1개',
-  },
-]
+type GroupItem = {
+  id: string
+  name: string
+  description: string | null
+  invite_code: string
+}
 
 export default function GroupListPage() {
   const navigate = useNavigate()
+  const [groups, setGroups] = useState<GroupItem[]>([])
+const [loading, setLoading] = useState(true)
+
+useEffect(() => {
+  const fetchGroups = async () => {
+    setLoading(true)
+
+    const { data, error } = await supabase
+      .from('groups')
+      .select('id, name, description, invite_code')
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('모임 목록 조회 실패:', error)
+      setGroups([])
+    } else {
+      setGroups(data ?? [])
+    }
+
+    setLoading(false)
+  }
+
+  fetchGroups()
+}, [])
 
   return (
     <div style={{ backgroundColor: palette.bgSoft, minHeight: '100vh' }}>
@@ -50,27 +70,47 @@ export default function GroupListPage() {
           </h2>
 
           <div className="mt-4 space-y-3">
-            {mockGroups.map((group) => (
-              <button
-                key={group.id}
-                onClick={() => navigate('/')}
-                className="w-full rounded-2xl border px-4 py-4 text-left"
-                style={{
-                  borderColor: palette.line,
-                  backgroundColor: palette.bg,
-                }}
-              >
-                <div
-                  className="text-sm font-semibold"
-                  style={{ color: palette.ink }}
-                >
-                  {group.name}
-                </div>
-                <div className="mt-1 text-xs" style={{ color: palette.muted }}>
-                  {group.sub}
-                </div>
-              </button>
-            ))}
+            {loading ? (
+  <div
+    className="rounded-2xl px-4 py-5 text-sm"
+    style={{ color: palette.muted, backgroundColor: palette.bgMuted }}
+  >
+    모임을 불러오는 중이에요...
+  </div>
+) : groups.length === 0 ? (
+  <div
+    className="rounded-2xl px-4 py-5 text-sm"
+    style={{ color: palette.muted, backgroundColor: palette.bgMuted }}
+  >
+    아직 참여 중인 모임이 없어요.
+  </div>
+) : (
+  groups.map((group) => (
+    <button
+      key={group.id}
+      onClick={() => navigate('/')}
+      className="w-full rounded-2xl border px-4 py-4 text-left"
+      style={{
+        borderColor: palette.line,
+        backgroundColor: palette.bg,
+      }}
+    >
+      <div
+        className="text-sm font-semibold"
+        style={{ color: palette.ink }}
+      >
+        {group.name}
+      </div>
+
+      <div
+        className="mt-1 text-xs"
+        style={{ color: palette.muted }}
+      >
+        {group.description || `초대코드: ${group.invite_code}`}
+      </div>
+    </button>
+  ))
+)}
           </div>
         </section>
 
