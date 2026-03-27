@@ -1,16 +1,27 @@
 import SyncleMark from '@/components/SyncleMark'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { supabase } from '@/lib/supabase'
 
 
 export default function SplashPage() {
   const navigate = useNavigate()
   useEffect(() => {
-  const timer = window.setTimeout(() => {
-    navigate('/login', { replace: true })
-  }, 1000)
+  const checkSession = async () => {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
 
-  return () => window.clearTimeout(timer)
+    window.setTimeout(() => {
+      if (session) {
+        navigate('/groups', { replace: true })
+      } else {
+        navigate('/login', { replace: true })
+      }
+    }, 1000)
+  }
+
+  checkSession()
 }, [navigate])
   return (
     <div
