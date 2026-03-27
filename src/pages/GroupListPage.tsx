@@ -88,7 +88,7 @@ useEffect(() => {
   groups.map((group) => (
     <button
       key={group.id}
-      onClick={() => navigate('/')}
+      onClick={() => navigate(`/group/${group.id}`)}
       className="w-full rounded-2xl border px-4 py-4 text-left"
       style={{
         borderColor: palette.line,

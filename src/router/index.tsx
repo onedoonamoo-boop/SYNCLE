@@ -116,6 +116,18 @@ export const router = createBrowserRouter([
           </WithSuspense>
         ),
       },
+      {
+  path: '/group/:groupId',
+  element: <WithSuspense><HomePage /></WithSuspense>,
+},
+{
+  path: '/group/:groupId/fee',
+  element: <WithSuspense><FeePage /></WithSuspense>,
+},
+{
+  path: '/group/:groupId/schedule',
+  element: <WithSuspense><SchedulePage /></WithSuspense>,
+},
     ],
   },
 ])
