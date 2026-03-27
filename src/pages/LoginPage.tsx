@@ -1,137 +1,116 @@
-
 import { useNavigate } from 'react-router-dom'
-import { KeyRound, PlusCircle } from 'lucide-react'
 import SyncleMark from '@/components/SyncleMark'
 import { synclePalette as palette } from '@/lib/synclePalette'
 
 /**
  * LoginPage
- * 역할: 소셜 로그인 + 로그인 후 모임 입장 분기 화면
- * 입력: 없음 (추후 Firebase Auth SDK로 교체)
- * 출력: 카카오/구글/네이버 소셜 버튼 + 초대코드 입력 / 새 모임 만들기 분기
- *
- * 수정 시 영향 범위:
- *   - handleKakaoLogin 등 → Firebase Auth signInWithPopup(provider)로 교체
- *   - 로그인 성공 시 navigate('/') → 모임 유무 체크 후 분기 예정
+ * 역할: 인증 전 진입 화면
+ * 현재 단계: Google / Kakao 버튼 UI와 라우팅 흐름만 확인
+ * 다음 단계:
+ * - Supabase OAuth 연결
+ * - 로그인 성공 시 /groups 이동
+ * - Naver 로그인은 2차 작업으로 추가
  */
+function SocialButton({
+  label,
+  bg,
+  color,
+  borderColor,
+  onClick,
+}: {
+  label: string
+  bg: string
+  color: string
+  borderColor?: string
+  onClick: () => void
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="w-full rounded-2xl px-4 py-3 text-sm font-semibold"
+      style={{
+        backgroundColor: bg,
+        color,
+        border: borderColor ? `1px solid ${borderColor}` : 'none',
+      }}
+    >
+      {label}
+    </button>
+  )
+}
 
 export default function LoginPage() {
   const navigate = useNavigate()
 
-  // TODO: Firebase Auth 연결 시 실제 소셜 로그인 함수로 교체
-  function handleSocialLogin(provider: string) {
-    console.log(`${provider} 로그인 시도 (미구현 — Firebase Auth 연결 필요)`)
-    navigate('/')
-  }
-
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-6" style={{ backgroundColor: palette.bgSoft }}>
-      {/* 로고 영역 */}
-      <div className="mb-8 flex flex-col items-center gap-3">
-        <SyncleMark size={64} />
-        <div className="text-center">
-          <div
-            className="text-2xl font-semibold"
-            style={{ color: palette.ink, letterSpacing: '0.12em' }}
-          >
-            SYNCLE
+    <div
+      className="min-h-screen px-6 py-10"
+      style={{ backgroundColor: palette.bgSoft }}
+    >
+      <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-[420px] flex-col justify-center">
+        <div
+          className="rounded-[32px] border bg-white px-6 py-8"
+          style={{
+            borderColor: palette.line,
+            boxShadow: '0 16px 40px rgba(17,24,39,0.06)',
+          }}
+        >
+          {/* 상단 브랜딩 */}
+          <div className="flex flex-col items-center text-center">
+            <SyncleMark size={72} />
+
+            <div className="mt-6 text-[28px] font-semibold tracking-[-0.03em]" style={{ color: palette.ink }}>
+              SYNCLE
+            </div>
+
+            <p
+              className="mt-3 text-sm leading-6"
+              style={{ color: palette.muted }}
+            >
+              흩어진 모임 운영을
+              <br />
+              하나의 흐름으로 이어보세요
+            </p>
           </div>
-          <div className="mt-1 text-sm" style={{ color: palette.muted }}>
-            모임 회비·운영을 한 번에
+
+          {/* 안내 문구 */}
+          <div
+            className="mt-8 rounded-2xl p-4"
+            style={{ backgroundColor: palette.bgMuted }}
+          >
+            <div className="text-sm font-medium" style={{ color: palette.ink }}>
+              먼저 로그인해 주세요
+            </div>
+            <div className="mt-1 text-xs leading-5" style={{ color: palette.muted }}>
+              로그인 후 내가 속한 모임을 선택해서 바로 들어갈 수 있어요.
+            </div>
+          </div>
+
+          {/* 소셜 로그인 버튼 */}
+          <div className="mt-6 space-y-3">
+            <SocialButton
+              label="Google로 계속하기"
+              bg={palette.bg}
+              color={palette.ink}
+              borderColor={palette.line}
+              onClick={() => navigate('/groups')}
+            />
+
+            <SocialButton
+              label="Kakao로 계속하기"
+              bg="#FEE500"
+              color="#191919"
+              onClick={() => navigate('/groups')}
+            />
+          </div>
+
+          {/* 하단 참고 */}
+          <div className="mt-6 text-center text-xs leading-5" style={{ color: palette.muted }}>
+            지금은 로그인 UI와 흐름만 먼저 연결한 상태예요.
+            <br />
+            다음 단계에서 Supabase OAuth를 붙일 예정이에요.
           </div>
         </div>
-      </div>
-
-      {/* 소셜 로그인 카드 */}
-      <div
-        className="w-full max-w-sm rounded-[24px] border bg-white p-5"
-        style={{ borderColor: palette.line, boxShadow: '0 8px 24px rgba(17,24,39,0.06)' }}
-      >
-        <h2 className="mb-4 text-[15px] font-semibold" style={{ color: palette.ink }}>
-          소셜 로그인으로 시작
-        </h2>
-
-        {/* 카카오 */}
-        <button
-          onClick={() => handleSocialLogin('kakao')}
-          className="mb-2 flex w-full items-center gap-3 rounded-2xl px-4 py-3.5 text-sm font-semibold"
-          style={{ backgroundColor: '#FEE500', color: '#191600' }}
-        >
-          <span className="text-base">💬</span>
-          카카오로 시작하기
-        </button>
-
-        {/* 구글 */}
-        <button
-          onClick={() => handleSocialLogin('google')}
-          className="mb-2 flex w-full items-center gap-3 rounded-2xl border px-4 py-3.5 text-sm font-semibold"
-          style={{ backgroundColor: '#fff', color: palette.ink, borderColor: palette.line }}
-        >
-          <span className="text-base">🔍</span>
-          구글로 시작하기
-        </button>
-
-        {/* 네이버 */}
-        <button
-          onClick={() => handleSocialLogin('naver')}
-          className="flex w-full items-center gap-3 rounded-2xl px-4 py-3.5 text-sm font-semibold"
-          style={{ backgroundColor: '#03C75A', color: '#fff' }}
-        >
-          <span className="text-base">🟢</span>
-          네이버로 시작하기
-        </button>
-      </div>
-
-      {/* 입장 분기 카드 */}
-      <div
-        className="mt-3 w-full max-w-sm rounded-[24px] border bg-white p-5"
-        style={{ borderColor: palette.line, boxShadow: '0 8px 24px rgba(17,24,39,0.06)' }}
-      >
-        <h2 className="mb-4 text-[15px] font-semibold" style={{ color: palette.ink }}>
-          어떻게 시작할까요?
-        </h2>
-
-        {/* 초대코드 입력 */}
-        <button
-          onClick={() => navigate('/')}
-          className="mb-2 flex w-full items-center justify-between rounded-2xl px-4 py-3.5"
-          style={{ backgroundColor: palette.bgSoft }}
-        >
-          <div className="flex items-center gap-3">
-            <div
-              className="flex h-10 w-10 items-center justify-center rounded-2xl"
-              style={{ backgroundColor: palette.bgMuted, color: palette.text }}
-            >
-              <KeyRound size={18} />
-            </div>
-            <div className="text-left">
-              <div className="text-sm font-medium" style={{ color: palette.ink }}>초대코드 입력</div>
-              <div className="mt-0.5 text-xs" style={{ color: palette.muted }}>초대받은 모임에 바로 입장</div>
-            </div>
-          </div>
-          <span style={{ color: palette.muted }}>›</span>
-        </button>
-
-        {/* 새 모임 만들기 */}
-        <button
-          onClick={() => navigate('/')}
-          className="flex w-full items-center justify-between rounded-2xl px-4 py-3.5"
-          style={{ backgroundColor: palette.bgSoft }}
-        >
-          <div className="flex items-center gap-3">
-            <div
-              className="flex h-10 w-10 items-center justify-center rounded-2xl"
-              style={{ backgroundColor: palette.infoBg, color: palette.infoText }}
-            >
-              <PlusCircle size={18} />
-            </div>
-            <div className="text-left">
-              <div className="text-sm font-medium" style={{ color: palette.ink }}>새 모임 만들기</div>
-              <div className="mt-0.5 text-xs" style={{ color: palette.muted }}>운영진으로 새 모임 시작</div>
-            </div>
-          </div>
-          <span style={{ color: palette.muted }}>›</span>
-        </button>
       </div>
     </div>
   )
